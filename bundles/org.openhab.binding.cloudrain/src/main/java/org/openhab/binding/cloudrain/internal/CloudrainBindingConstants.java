@@ -68,8 +68,8 @@ public class CloudrainBindingConstants {
     public static final String ERROR_MSG_STATUS_UPDATE_IRRIGATION = "Failed to retrieve irrigation information. Details: {}";
     public static final String ERROR_MSG_ZONE_NOT_FOUND = "Zone with id {} is unknown by the API. Maybe the zone got deleted in the app or this is due to test mode. Test Mode is: {}";
     public static final String ERROR_MSG_IRRIGATION_COMMAND = "Failed to execute irrigation command for zone {}. Details: {}";
-    public static final String ERROR_MSG_ZONE_REGISTRATION = "Could not register zone {} for updates. AccountHandler not found";
-    public static final String ERROR_MSG_ACCOUNTHANDLER_NOT_FOUND = "Failed to retrieve AccountHandler. Bridge not yet initialized. Please try again later.";
+    public static final String ERROR_MSG_ZONE_REGISTRATION = "Could not register zone {} for updates.";
+    public static final String ERROR_MSG_ACCOUNTHANDLER_NOT_FOUND = "Bridge not yet initialized. Please try again later.";
     public static final String ERROR_MSG_DISCOVERY_SCAN = "Error waiting for discovery scan: {}";
     public static final String ERROR_MSG_DISCOVERY_FAILED = "Discovery scan failed. Bridge not yet initialized. Please re-run scan later.";
     public static final String ERROR_MSG_DISCOVERY_FAILED_ZONE = "Discovery of zone {} failed. Bridge not yet initialized. Please re-run scan later.";

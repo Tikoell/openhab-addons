@@ -41,6 +41,7 @@ import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingStatus;
+import org.openhab.core.thing.ThingStatusDetail;
 import org.openhab.core.thing.binding.BaseThingHandler;
 import org.openhab.core.thing.link.ItemChannelLinkRegistry;
 import org.openhab.core.types.Command;
@@ -130,7 +131,7 @@ public class CloudrainZoneHandler extends BaseThingHandler {
      *
      * @param thing the Cloudrain Zone thing
      * @param cloudrainAPI the initialized Cloudrain API. Handlers of this class expect that the
-     *            {@link CloudrainAccountHanlder} has already authenticated.
+     *            {@link CloudrainAccountHandler} has already authenticated.
      * @param timeZoneProvider the TimeZoneProvider for handling dates
      * @param itemChannelLinkRegistry required for checking this Zone's channel link status
      * @param timeZoneProvider a {@link TimeZoneProvider} for date time localization
@@ -151,7 +152,7 @@ public class CloudrainZoneHandler extends BaseThingHandler {
             zoneId = zoneIdFromProperty;
             // schedule initialization tasks
             scheduler.execute(() -> {
-                CloudrainAccountHanlder handler = getAccountHanlder();
+                CloudrainAccountHandler handler = getAccountHandler();
                 if (handler != null) {
                     // Register the zone to receive property and status updates
                     handler.registerZone(zoneId, getThing());
@@ -172,8 +173,7 @@ public class CloudrainZoneHandler extends BaseThingHandler {
                 }
             });
         } else {
-            logger.warn(ERROR_MSG_ZONE_ID_PROPERTY);
-            updateStatus(ThingStatus.OFFLINE);
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR, ERROR_MSG_ZONE_ID_PROPERTY);
         }
     }
 
@@ -192,7 +192,7 @@ public class CloudrainZoneHandler extends BaseThingHandler {
 
     private void unregisterAll() {
         // unregister this zone from the account handler
-        CloudrainAccountHanlder handler = getAccountHanlder();
+        CloudrainAccountHandler handler = getAccountHandler();
         if (handler != null) {
             handler.unregisterZone(zoneId);
             handler.unregisterFromIrrigationUpdates(zoneId);
@@ -223,8 +223,8 @@ public class CloudrainZoneHandler extends BaseThingHandler {
                         updateStatusFromAPI();
                     }, 5, TimeUnit.SECONDS);
                 } catch (CloudrainAPIException e) {
-                    logger.warn(ERROR_MSG_IRRIGATION_COMMAND, zoneId, e.getMessage());
-                    updateStatus(ThingStatus.OFFLINE);
+                    updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
+                            String.format(ERROR_MSG_IRRIGATION_COMMAND, zoneId, e.getMessage()));
                 }
             } else if (CHANNEL_ID_DURATION_CMD.equals(channelUID.getIdWithoutGroup())) {
                 if (command instanceof DecimalType) {
@@ -253,13 +253,13 @@ public class CloudrainZoneHandler extends BaseThingHandler {
                 updateIrrigationState(irrigation);
                 return true;
             } else {
-                logger.debug(ERROR_MSG_ZONE_NOT_FOUND, zoneId, getAccountConfig().getTestMode());
-                updateStatus(ThingStatus.OFFLINE);
+                updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.GONE,
+                        String.format(ERROR_MSG_ZONE_NOT_FOUND, zoneId, getAccountConfig().getTestMode()));
                 return false;
             }
         } catch (CloudrainAPIException e) {
-            logger.warn(ERROR_MSG_STATUS_UPDATE, zoneId, e.getMessage());
-            updateStatus(ThingStatus.OFFLINE);
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
+                    String.format(ERROR_MSG_STATUS_UPDATE, zoneId, e.getMessage()));
             return false;
         }
     }
@@ -270,12 +270,12 @@ public class CloudrainZoneHandler extends BaseThingHandler {
         // if a relevant channel is linked this zone has to be updated from the central status polling
         if (CHANNEL_GROUP_ID_IRRIGATION.equals(channelUID.getGroupId())) {
             // the account handler performs polling for all zones if at least one is registered for updates
-            CloudrainAccountHanlder handler = getAccountHanlder();
+            CloudrainAccountHandler handler = getAccountHandler();
             if (handler != null) {
                 handler.registerForIrrigationUpdates(zoneId, getThing());
             } else {
-                logger.warn(ERROR_MSG_ZONE_REGISTRATION, zoneId);
-                updateStatus(ThingStatus.OFFLINE);
+                updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.HANDLER_MISSING_ERROR,
+                        String.format(ERROR_MSG_ZONE_REGISTRATION, zoneId));
             }
         }
     }
@@ -286,7 +286,7 @@ public class CloudrainZoneHandler extends BaseThingHandler {
         // if a channel is unlinked we need to check whether this zone still requires updates from polling
         if (!isAnyIrrigationChannelLinked()) {
             // if no channel is linked this zone may unregister from updates
-            CloudrainAccountHanlder handler = getAccountHanlder();
+            CloudrainAccountHandler handler = getAccountHandler();
             if (handler != null) {
                 handler.unregisterFromIrrigationUpdates(zoneId);
             }
@@ -314,7 +314,7 @@ public class CloudrainZoneHandler extends BaseThingHandler {
         if (zoneId.equals(zone.getId())) {
             updateProperty(PROPERTY_ZONE_NAME, zone.getNameWithDefault());
             updateProperty(PROPERTY_CTRL_NAME, zone.getControllerNameWithDefault());
-            updateProperty(PROPERTY_CTRL_ID, zone.getControlleIdWithDefault());
+            updateProperty(PROPERTY_CTRL_ID, zone.getControllerIdWithDefault());
         }
     }
 
@@ -404,14 +404,14 @@ public class CloudrainZoneHandler extends BaseThingHandler {
     }
 
     /**
-     * Helper method to obtain the {@link CloudrainAccountHanlder}.
+     * Helper method to obtain the {@link CloudrainAccountHandler}.
      *
-     * @return the {@link CloudrainAccountHanlder}.
+     * @return the {@link CloudrainAccountHandler}.
      */
-    private @Nullable CloudrainAccountHanlder getAccountHanlder() {
+    private @Nullable CloudrainAccountHandler getAccountHandler() {
         Bridge bridge = getBridge();
-        if (bridge != null && bridge.getHandler() instanceof CloudrainAccountHanlder) {
-            return (CloudrainAccountHanlder) bridge.getHandler();
+        if (bridge != null && bridge.getHandler() instanceof CloudrainAccountHandler) {
+            return (CloudrainAccountHandler) bridge.getHandler();
         }
         return null;
     }
