@@ -47,8 +47,6 @@ import org.openhab.core.thing.link.ItemChannelLinkRegistry;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 import org.openhab.core.types.UnDefType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The {@link CloudrainZoneHandler} is responsible for handling Zone Things representing irrigation zones in the
@@ -62,8 +60,6 @@ import org.slf4j.LoggerFactory;
  */
 @NonNullByDefault
 public class CloudrainZoneHandler extends BaseThingHandler {
-
-    private final Logger logger = LoggerFactory.getLogger(CloudrainZoneHandler.class);
 
     /**
      * A reference to the {@link ItemChannelLinkRegistry} for checking the link status
@@ -168,8 +164,8 @@ public class CloudrainZoneHandler extends BaseThingHandler {
                         updateStatus(ThingStatus.ONLINE);
                     }
                 } else {
-                    logger.warn(ERROR_MSG_ZONE_REGISTRATION, zoneId);
-                    updateStatus(ThingStatus.OFFLINE);
+                    updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.HANDLER_MISSING_ERROR,
+                            String.format(ERROR_MSG_ZONE_REGISTRATION, zoneId));
                 }
             });
         } else {
@@ -253,7 +249,7 @@ public class CloudrainZoneHandler extends BaseThingHandler {
                 updateIrrigationState(irrigation);
                 return true;
             } else {
-                updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.GONE,
+                updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.NONE,
                         String.format(ERROR_MSG_ZONE_NOT_FOUND, zoneId, getAccountConfig().getTestMode()));
                 return false;
             }

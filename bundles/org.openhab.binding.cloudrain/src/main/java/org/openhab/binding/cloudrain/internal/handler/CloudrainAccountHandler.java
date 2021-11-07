@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -86,12 +87,12 @@ public class CloudrainAccountHandler extends BaseBridgeHandler {
     /**
      * The zoneRegistry contains all zoneIds and active zone things
      */
-    private Map<String, Thing> zoneRegistry;
+    private ConcurrentHashMap<String, Thing> zoneRegistry;
 
     /**
      * The statusUpdateRegistry contains all zoneIds and zone things which register for updates from the statusUpdateJob
      */
-    private Map<String, Thing> statusUpdateRegistry;
+    private ConcurrentHashMap<String, Thing> statusUpdateRegistry;
 
     /**
      * Creates this {@link CloudrainAccountHandler}
@@ -103,8 +104,8 @@ public class CloudrainAccountHandler extends BaseBridgeHandler {
         super(bridge);
         this.cloudrainAPI = cloudrainAPI;
         this.config = getThing().getConfiguration().as(CloudrainConfig.class);
-        this.statusUpdateRegistry = new HashMap<String, Thing>();
-        this.zoneRegistry = new HashMap<String, Thing>();
+        this.statusUpdateRegistry = new ConcurrentHashMap<String, Thing>();
+        this.zoneRegistry = new ConcurrentHashMap<String, Thing>();
     }
 
     @Override
@@ -225,7 +226,9 @@ public class CloudrainAccountHandler extends BaseBridgeHandler {
                     for (Irrigation irrigation : irrigations) {
                         String zoneId = irrigation.getZoneId();
                         if (zoneId == null || zoneId.isBlank()) {
-                            throw new CloudrainAPIException(ERROR_MSG_GET_IRRIGATION_ZONE_ID);
+                            // Skip this irrigation. No processing possible without zoneId.
+                            logger.warn(ERROR_MSG_GET_IRRIGATION_ZONE_ID);
+                            continue;
                         }
                         Thing zoneThing = statusUpdateRegistry.get(zoneId);
                         if (zoneThing != null) {
