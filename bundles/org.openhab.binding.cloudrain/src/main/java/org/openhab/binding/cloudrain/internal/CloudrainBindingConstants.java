@@ -56,9 +56,6 @@ public class CloudrainBindingConstants {
     public static final String CHANNEL_ID_CHANGE_CMD = "changeIrrigation";
     public static final String CHANNEL_ID_STOP_CMD = "stopIrrigation";
 
-    public static final String CHANNEL_STATE_VALUE_ON = "ON";
-    public static final String CHANNEL_STATE_VALUE_OFF = "OFF";
-
     public static final String ERROR_MSG_CONFIG_PARAMS = "Mandatory configuration parameters missing for authenticating. Please check the account configuration page.";
     public static final String ERROR_MSG_API_AUTH = "Failed to authenticate at the Cloudrain API. Please check the configuration. API response: %s";
     public static final String ERROR_MSG_GET_ZONES = "Failed to discover zones from the Cloudrain API. Details: {}";

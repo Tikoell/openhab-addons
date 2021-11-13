@@ -79,7 +79,7 @@ Irrigation Zones have two groups of channels: Status channels to receive informa
 
 | Channel                   | Type     | Description                                                                                  |
 |---------------------------|----------|----------------------------------------------------------------------------------------------|
-| status                    | String   | The irrigation status in the irrigation zone (ON \| OFF)                                     |
+| status                    | Switch   | The irrigation status in the irrigation zone (ON \| OFF)                                     |
 | duration                  | Integer  | The total duration in seconds of an active irrigation. NULL if no irrigation is active.      |
 | remainingSeconds          | Integer  | The remaining duration in seconds of an active irrigation. NULL if no irrigation is active.  |
 | startTime                 | Time     | The local time at which the irrigation was started. NULL if no irrigation is active.         |
@@ -113,7 +113,6 @@ In the items file, you can link items to channels of your things:
 ```
 // irrigation info channels
 Switch Zone1_State {channel="cloudrain:zone:xyz:abc:irrigation#state"}
-String Zone1_Statustext "Status: [%s]" {channel="cloudrain:zone:xyz:abc:irrigation#state"}
 Number Zone1_Duration "Duration: [%d sec]" {channel="cloudrain:zone:xyz:abc:irrigation#duration"}
 Number Zone1_Remaining "Remaining: [%d sec]" {channel="cloudrain:zone:xyz:abc:irrigation#remainingSeconds"}
 DateTime Zone1_Start "Start: [%1$ta %1$tR]" {channel="cloudrain:zone:xyz:abc:irrigation#startTime"}

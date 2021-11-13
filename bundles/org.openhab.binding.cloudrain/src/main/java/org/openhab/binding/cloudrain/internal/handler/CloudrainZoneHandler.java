@@ -35,7 +35,6 @@ import org.openhab.core.items.Item;
 import org.openhab.core.library.types.DateTimeType;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.OnOffType;
-import org.openhab.core.library.types.StringType;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ChannelUID;
@@ -321,7 +320,7 @@ public class CloudrainZoneHandler extends BaseThingHandler {
      */
     public void updateIrrigationState(@Nullable Irrigation irrigation) {
         // Default Channel state
-        State statusState = new StringType(CHANNEL_STATE_VALUE_OFF);
+        State statusState = OnOffType.OFF;
         State startTimeState = UnDefType.NULL;
         State endTimeState = UnDefType.NULL;
         State durationState = UnDefType.NULL;
@@ -330,7 +329,7 @@ public class CloudrainZoneHandler extends BaseThingHandler {
         if (irrigation != null) {
             // Retrieve actual state from irrigation if it is active
             if (irrigation.isActive()) {
-                statusState = new StringType(CHANNEL_STATE_VALUE_ON);
+                statusState = OnOffType.ON;
                 startTimeState = convertToState(irrigation.getStartTime(), timeZoneProvider);
                 endTimeState = convertToState(irrigation.getPlannedEndTime(), timeZoneProvider);
                 durationState = convertToState(irrigation.getDuration());

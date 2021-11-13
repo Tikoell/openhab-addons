@@ -92,15 +92,10 @@
 	</channel-type>
 
 	<channel-type id="state">
-		<item-type>String</item-type>
+		<item-type>Switch</item-type>
 		<label>State</label>
 		<description>The state of an irrigation</description>
-		<state readOnly="true">
-			<options>
-				<option value="ON">ON</option>
-				<option value="OFF">OFF</option>
-			</options>
-		</state>
+		<state readOnly="true"/>
 	</channel-type>
 
 	<channel-type id="timestamp">
